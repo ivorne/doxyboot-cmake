@@ -9,6 +9,8 @@ set_property( GLOBAL PROPERTY DOXYBOOT_BINARY_DIR_PROP ${CMAKE_CURRENT_BINARY_DI
 # Variables used by doxyboot_add_docs:
 #    DOXYBOOT_HTML_HEADER - Html file containing <div class="container"></div> with content displayed on top of the page.
 #    DOXYBOOT_HTML_FOOTER - Html file containing <div class="container"></div> with content displayed on the bottom of the page.
+#    DOXYBOOT_HTML_EXTRA_STYLESHEET - Use instead of DOXYGEN_HTML_EXTRA_STYLESHEET.
+#    DOXYBOOT_HTML_EXTRA_FILES - Use instead of DOXYGEN_HTML_EXTRA_FILES.
 #
 function( doxyboot_add_docs target_name cpp_target src_dir )
     find_package( Doxygen 1.8.17 )
@@ -31,44 +33,111 @@ function( doxyboot_add_docs target_name cpp_target src_dir )
         string( REPLACE "%{doxyboot_footer}" "${STR_CUSTOM_FOOTER}" STR_FOOTER_RESULT "${STR_FOOTER_TEMPLATE}" )
         file( WRITE "${DOXYBOOT_BINARY_DIR}/${target_name}_footer.html" ${STR_FOOTER_RESULT} )
         
-        # style
+        # prepare stylesheet list
+        set( EXTRA_STYLESHEETS )
+        foreach( FILEPATH ${DOXYBOOT_HTML_EXTRA_STYLESHEET} )
+            if( IS_ABSOLUTE "${FILEPATH}" )
+                set( EXTRA_STYLESHEETS ${EXTRA_STYLESHEETS} "${FILEPATH}" )
+            else()
+                set( EXTRA_STYLESHEETS ${EXTRA_STYLESHEETS} "${CMAKE_CURRENT_SOURCE_DIR}/${FILEPATH}" )
+            endif()
+        endforeach()
+        
+        # prepare extra files list
+        set( EXTRA_FILES )
+        foreach( FILEPATH ${DOXYBOOT_HTML_EXTRA_FILES} )
+            if( IS_ABSOLUTE "${FILEPATH}" )
+                set( EXTRA_FILES ${EXTRA_FILES} "${FILEPATH}" )
+            else()
+                set( EXTRA_FILES ${EXTRA_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/${FILEPATH}" )
+            endif()
+        endforeach()
+        
+        # style - forced
         set( DOXYGEN_HTML_HEADER "${DOXYBOOT_BINARY_DIR}/${target_name}_header.html" )
         set( DOXYGEN_HTML_FOOTER "${DOXYBOOT_BINARY_DIR}/${target_name}_footer.html" )
-        set( DOXYGEN_HTML_EXTRA_STYLESHEET "${DOXYBOOT_SOURCE_DIR}/theme/customdoxygen.css" )
-        set( DOXYGEN_HTML_EXTRA_FILES "${DOXYBOOT_SOURCE_DIR}/theme/doxy-boot.js" )
+        set( DOXYGEN_HTML_EXTRA_STYLESHEET "${DOXYBOOT_SOURCE_DIR}/theme/customdoxygen.css" ${EXTRA_STYLESHEETS} )
+        set( DOXYGEN_HTML_EXTRA_FILES "${DOXYBOOT_SOURCE_DIR}/theme/doxy-boot.js" ${EXTRA_FILES} )
         set( DOXYGEN_HTML_DYNAMIC_MENUS "NO" )
         set( DOXYGEN_GENERATE_TREEVIEW "NO" )
         set( DOXYGEN_GENERATE_HTML "YES" )
         set( DOXYGEN_HTML_TIMESTAMP "YES" )
-        
-        # options
-        #set( DOXYGEN_CLANG_ASSISTED_PARSING "YES" )
-        set( DOXYGEN_PROJECT_NUMBER "0.0.0" )
-        set( DOXYGEN_BUILTIN_STL_SUPPORT "YES" )
-        set( DOXYGEN_SOURCE_BROWSER "YES" )
-        set( DOXYGEN_COLS_IN_ALPHA_INDEX "2" )
-        set( DOXYGEN_CLASS_DIAGRAMS "NO" )
-        set( DOXYGEN_CLASS_GRAPH "NO" )
-        set( DOXYGEN_COLLABORATION_GRAPH "NO" )
-        set( DOXYGEN_INCLUDE_GRAPH "NO" )
-        set( DOXYGEN_INCLUDED_BY_GRAPH "NO" )
-        set( DOXYGEN_DOT_IMAGE_FORMAT "svg" )
-        set( DOXYGEN_EXTRACT_ALL "YES" )
-        set( DOXYGEN_SORT_MEMBER_DOCS "NO" )
         set( DOXYGEN_GENERATE_TAGFILE "${CMAKE_CURRENT_BINARY_DIR}/html/${cpp_target}.tag" )
-        set( DOXYGEN_SHOW_NAMESPACES "NO" )
-        set( DOXYGEN_EXTERNAL_GROUPS "NO" )
-        set( DOXYGEN_EXTERNAL_PAGES "NO" )
         
-        # bugs
-        set( DOXYGEN_SOURCE_TOOLTIPS "NO" )  # does not work, causes errors in console and disrupts bootstrap scripts
+        # bugs - forced
+        if( NOT DOXYGEN_SOURCE_TOOLTIPS )
+            set( DOXYGEN_SOURCE_TOOLTIPS "NO" )  # does not work, causes errors in console and disrupts bootstrap scripts
+        endif()
         
-        # warnings
-        set( DOXYGEN_WARN_IF_UNDOCUMENTED "NO" )
+        # options - optional
+        #set( DOXYGEN_PROJECT_NUMBER "0.0.0" )
         
-        # include directories
-        get_target_property_recursive( DOX_INCLUDE_DIRECTORIES ${cpp_target} INCLUDE_DIRECTORIES )
-        set( DOXYGEN_INCLUDE_PATH ${DOX_INCLUDE_DIRECTORIES} )
+        if( NOT DOXYGEN_BUILTIN_STL_SUPPORT )
+        set( DOXYGEN_BUILTIN_STL_SUPPORT "YES" )
+        endif()
+        
+        if( NOT DOXYGEN_SOURCE_BROWSER )
+            set( DOXYGEN_SOURCE_BROWSER "YES" )
+        endif()
+        
+        if( NOT DOXYGEN_COLS_IN_ALPHA_INDEX )
+            set( DOXYGEN_COLS_IN_ALPHA_INDEX "2" )
+        endif()
+        
+        if( NOT DOXYGEN_CLASS_DIAGRAMS )
+            set( DOXYGEN_CLASS_DIAGRAMS "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_CLASS_GRAPH )
+            set( DOXYGEN_CLASS_GRAPH "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_COLLABORATION_GRAPH )
+            set( DOXYGEN_COLLABORATION_GRAPH "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_INCLUDE_GRAPH )
+            set( DOXYGEN_INCLUDE_GRAPH "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_INCLUDED_BY_GRAPH )
+            set( DOXYGEN_INCLUDED_BY_GRAPH "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_DOT_IMAGE_FORMAT )
+            set( DOXYGEN_DOT_IMAGE_FORMAT "svg" )
+        endif()
+        
+        if( NOT DOXYGEN_EXTRACT_ALL )
+            set( DOXYGEN_EXTRACT_ALL "YES" )
+        endif()
+        
+        if( NOT DOXYGEN_SORT_MEMBER_DOCS )
+            set( DOXYGEN_SORT_MEMBER_DOCS "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_SHOW_NAMESPACES )
+            set( DOXYGEN_SHOW_NAMESPACES "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_EXTERNAL_GROUPS )
+            set( DOXYGEN_EXTERNAL_GROUPS "NO" )
+        endif()
+        
+        if( NOT DOXYGEN_EXTERNAL_PAGES )
+            set( DOXYGEN_EXTERNAL_PAGES "NO" )
+        endif()
+        
+        # warnings - optional
+        #if( NOT DOXYGEN_WARN_IF_UNDOCUMENTED )
+        #    set( DOXYGEN_WARN_IF_UNDOCUMENTED "NO" )
+        #endif()
+        
+        # include directories - optional
+        if( NOT DOXYGEN_INCLUDE_PATH )
+            get_target_property_recursive( DOX_INCLUDE_DIRECTORIES ${cpp_target} INCLUDE_DIRECTORIES )
+            set( DOXYGEN_INCLUDE_PATH ${DOX_INCLUDE_DIRECTORIES} )
+        endif()
         
         # src_dir preprocess
         if( IS_ABSOLUTE "${src_dir}" )
