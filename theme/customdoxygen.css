@@ -342,6 +342,7 @@ span.SRScope {
 
 .table > tbody > tr > td.memSeparator {
   line-height: 0;
+  padding: 4px;
   .table-hover;
 
 }

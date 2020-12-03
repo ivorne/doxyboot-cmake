@@ -71,9 +71,12 @@ function( doxyboot_add_docs target_name cpp_target src_dir )
         
         # options - optional
         #set( DOXYGEN_PROJECT_NUMBER "0.0.0" )
+        if( NOT DOXYGEN_JAVADOC_AUTOBRIEF )
+            set( DOXYGEN_JAVADOC_AUTOBRIEF "YES" )
+        endif()
         
         if( NOT DOXYGEN_BUILTIN_STL_SUPPORT )
-        set( DOXYGEN_BUILTIN_STL_SUPPORT "YES" )
+            set( DOXYGEN_BUILTIN_STL_SUPPORT "YES" )
         endif()
         
         if( NOT DOXYGEN_SOURCE_BROWSER )

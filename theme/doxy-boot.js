@@ -72,7 +72,7 @@ $( document ).ready(function() {
     {
         $('div.fragment.well div.line:first').parent().removeClass('fragment well');
     }
-
+/*
     $('table.memberdecls').find('.memItemRight').each(function(){
         $(this).contents().appendTo($(this).siblings('.memItemLeft'));
         $(this).siblings('.memItemLeft').attr('align', 'left');
@@ -81,7 +81,7 @@ $( document ).ready(function() {
     $('table.memberdecls').find('.memTemplItemRight').each(function(){
         $(this).contents().appendTo($(this).siblings('.memTemplItemLeft'));
         $(this).siblings('.memTemplItemLeft').attr('align', 'left');
-    });
+    });*/
 
     function getOriginalWidthOfImg(img_element) {
         var t = new Image();
@@ -249,7 +249,7 @@ $( document ).ready(function() {
     $("a.el").removeClass('el').addClass('dox-el');
     $("div.ah").removeClass('ah').addClass('dox-ah');
     $("div.header").removeClass("header").addClass('dox-header');
-
+/*
     $('.mdescLeft').each(function(){
         if($(this).html()=="&nbsp;") {
             $(this).siblings('.mdescRight').attr('colspan', 2);
@@ -267,7 +267,7 @@ $( document ).ready(function() {
             $(this).attr('colspan', 2);
             $(this).siblings('.memTemplItemRight').remove();
         }
-    });
+    });*/
     
     /* ------ class page ---------------------------------------- */
     /* Move detailed description to the top of the page */
